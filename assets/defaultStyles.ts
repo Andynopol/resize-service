@@ -7,6 +7,7 @@ export const DEFAULT_STYLE = `
     }
     .resize-separator{
         background-color: #000;
+        z-index: 9999;
     }
 `;
 
