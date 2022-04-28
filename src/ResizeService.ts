@@ -2,6 +2,7 @@ import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } f
 import { SizeKey } from "../constants/enum";
 import { ConstraintValueObject } from "../constants/interfaces";
 import { Orientation } from "../constants/types";
+import { capitalize } from "../utils/script";
 
 export class ResizeService {
     private _context: HTMLElement;
@@ -92,6 +93,8 @@ export class ResizeService {
                 }
                 container.style[ this.size ] = `${ initSize }px`;
             } );
+        } else {
+            //render for array of values
         }
     }
 
@@ -99,7 +102,8 @@ export class ResizeService {
         appendCss && ( () => { this.appendDefaultCSS(); this.addClasses(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
-            this.renderInitSize( this.orientation === "vertical" ? this.context.offsetHeight / this.containers.length - this.separatorSize / ( this.containers.length - 1 ) : this.context.offsetWidth / this.containers.length - this.separatorSize / ( this.containers.length - 1 ) );
+            this.renderInitSize( this.context[ `offset${ capitalize( this.size ) }` ] / this.containers.length - this.separatorSize / ( this.containers.length - 1 ) );
+
     }
 
     private createSeparator () {
@@ -134,11 +138,18 @@ export class ResizeService {
 
     private moveSeparator ( e: MouseEvent ) {
         if ( this._dragging ) {
-            const valueToSubstract = this.containers.slice( 0, this.containers.indexOf( this.previousSibling ) ).reduce( ( accumulator, container ) =>
-                accumulator + ( this.orientation === "vertical" ? container.offsetHeight : accumulator + container.offsetWidth )
-                , 0 );
-            const previousContainerSize = ( e.pageY - this.context.getBoundingClientRect().top - valueToSubstract );
-            const nextContainerSize = this.nextSibling.offsetHeight + this.previousSibling.offsetHeight - previousContainerSize;
+            const sumOfPreviousContainersSize = this.containers.slice( 0,
+                this.containers.indexOf( this.previousSibling ) ).reduce(
+                    ( accumulator, container ) => accumulator + container[ `offset${ capitalize( this.size ) }` ] + this.separatorSize
+                    , 0 );
+            const previousContainerSize = (
+                e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
+                this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] -
+                sumOfPreviousContainersSize );
+            const nextContainerSize = (
+                this.nextSibling[ `offset${ capitalize( this.size ) }` ] +
+                this.previousSibling[ `offset${ capitalize( this.size ) }` ] -
+                previousContainerSize );
             this.previousSibling.style[ this.size ] = `${ previousContainerSize }px`;
             this.nextSibling.style[ this.size ] = `${ nextContainerSize }px`;
         }
