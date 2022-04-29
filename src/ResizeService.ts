@@ -1,8 +1,8 @@
-import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "../assets/defaultStyles";
-import { SizeKey } from "../constants/enum";
-import { ConstraintValueObject } from "../constants/interfaces";
-import { Orientation } from "../constants/types";
-import { capitalize } from "../utils/script";
+import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
+import { SizeKey } from "./constants/enum";
+import { ConstraintValueObject } from "./constants/interfaces";
+import { Orientation } from "./constants/types";
+import { capitalize } from "./utils/script";
 
 export class ResizeService {
     private _context: HTMLElement;
