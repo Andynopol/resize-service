@@ -91,7 +91,8 @@ export class ResizeService {
                 } else {
                     container.style.height = "100%";
                 }
-                container.style[ this.size ] = `${ initSize }px`;
+                container.style[ this.size ] = `${ initSize - this.separatorSize / 2 }px`;
+
             } );
         } else {
             //render for array of values
@@ -102,7 +103,7 @@ export class ResizeService {
         appendCss && ( () => { this.appendDefaultCSS(); this.addClasses(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
-            this.renderInitSize( this.context[ `offset${ capitalize( this.size ) }` ] / this.containers.length - this.separatorSize / ( this.containers.length - 1 ) );
+            this.renderInitSize( this.context[ `offset${ capitalize( this.size ) }` ] / this.containers.length );
 
     }
 
