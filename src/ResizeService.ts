@@ -2,7 +2,7 @@ import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } f
 import { SizeKey } from "./constants/enum";
 import { ConstraintValueObject } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
-import { capitalize } from "./utils/script";
+import { capitalize, getProcentage } from "./utils/script";
 
 export class ResizeService {
     private _context: HTMLElement;
@@ -14,14 +14,16 @@ export class ResizeService {
     private _dragging: Boolean = false;
     private _previousSibling: HTMLElement;
     private _nextSibling: HTMLElement;
-    private _size: "width" | "height";
+    private _sizeKey: "width" | "height";
+    private _offsetSizeKey: string;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: ConstraintValueObject<any> ) {
         this._context = context;
         this._containers = containers;
         this._rules = rules;
         this._orientation = orientation;
-        this._size = SizeKey[ orientation ];
+        this._sizeKey = SizeKey[ orientation ];
+        this._offsetSizeKey = `offset${ capitalize( this.sizeKey ) }`;
         this._rules = rules;
     }
 
@@ -41,8 +43,12 @@ export class ResizeService {
         return this._separatorSize;
     }
 
-    private get size () {
-        return this._size;
+    private get offsetSizeKey () {
+        return this._offsetSizeKey;
+    }
+
+    private get sizeKey () {
+        return this._sizeKey;
     }
 
     private get previousSibling () {
@@ -73,14 +79,14 @@ export class ResizeService {
     private appendDefaultCSS () {
         const styles = document.createElement( 'style' );
         styles.textContent = styles.textContent + DEFAULT_STYLE;
-        this.orientation === "vertical" && ( styles.textContent = styles.textContent + VERTICAL_DEDICATED_STYLE );
-        this.orientation === "horizontal" && ( styles.textContent = styles.textContent + HORIZONTAL_DEDICATED_STYLE );
+        styles.textContent = styles.textContent + VERTICAL_DEDICATED_STYLE;
+        styles.textContent = styles.textContent + HORIZONTAL_DEDICATED_STYLE;
         this.context.appendChild( styles );
     }
 
     private addClasses () {
-        this._context.id = "resize-main-context";
-        this._containers.forEach( container => container.classList.add( "resize-container" ) );
+        this.context.classList.add( "resize-main-context", `${ this.orientation }-resize-context` );
+        this.containers.forEach( container => container.classList.add( "resize-container" ) );
     }
 
     private renderInitSize ( initSize: number | Array<number> ) {
@@ -91,7 +97,7 @@ export class ResizeService {
                 } else {
                     container.style.height = "100%";
                 }
-                container.style[ this.size ] = `${ initSize - this.separatorSize * ( this.containers.length - 1 ) / this.containers.length }px`;
+                container.style[ this.sizeKey ] = `${ initSize - getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) }%`;
 
             } );
         } else {
@@ -100,21 +106,21 @@ export class ResizeService {
     }
 
     public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
-        appendCss && ( () => { this.appendDefaultCSS(); this.addClasses(); } )();
+        this.addSeparators();
+        this.addClasses();
+        appendCss && ( () => { this.appendDefaultCSS(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
-            this.renderInitSize( this.context[ `offset${ capitalize( this.size ) }` ] / this.containers.length );
-
+            this.renderInitSize( 100 / this.containers.length );
     }
 
     private createSeparator () {
         const separatorElement = document.createElement( 'div' );
-        separatorElement.classList.add( 'resize-separator' );
-        separatorElement.style[ this.size ] = `${ this.separatorSize }px`;
+        separatorElement.classList.add( 'resize-separator', `${ this.orientation }-resize-separator` );
         return separatorElement;
     }
 
-    public addSeparators () {
+    private addSeparators () {
         for ( let index = 0; index < this.containers.length - 1; index++ ) {
             const separatorElement = this.createSeparator();
             separatorElement.addEventListener( 'mousedown', this.activateSeparator.bind( this ) );
@@ -139,20 +145,21 @@ export class ResizeService {
 
     private moveSeparator ( e: MouseEvent ) {
         if ( this._dragging ) {
-            const sumOfPreviousContainersSize = this.containers.slice( 0,
+            const sumOfPreviousContainersSize = getProcentage( this.context[ `offset${ capitalize( this.sizeKey ) }` ], this.containers.slice( 0,
                 this.containers.indexOf( this.previousSibling ) ).reduce(
-                    ( accumulator, container ) => accumulator + container[ `offset${ capitalize( this.size ) }` ] + this.separatorSize
-                    , 0 );
+                    ( accumulator, container ) => accumulator + container[ `offset${ capitalize( this.sizeKey ) }` ]
+                    , 0 ) );
+            console.log( sumOfPreviousContainersSize );
             const previousContainerSize = (
-                e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
-                this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] -
+                getProcentage( this.context[ `offset${ capitalize( this.sizeKey ) }` ], e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
+                    this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] ) -
                 sumOfPreviousContainersSize );
             const nextContainerSize = (
-                this.nextSibling[ `offset${ capitalize( this.size ) }` ] +
-                this.previousSibling[ `offset${ capitalize( this.size ) }` ] -
+                getProcentage( this.context[ `offset${ capitalize( this.sizeKey ) }` ], this.nextSibling[ `offset${ capitalize( this.sizeKey ) }` ] +
+                    this.previousSibling[ `offset${ capitalize( this.sizeKey ) }` ] ) -
                 previousContainerSize );
-            this.previousSibling.style[ this.size ] = `${ previousContainerSize }px`;
-            this.nextSibling.style[ this.size ] = `${ nextContainerSize }px`;
+            this.previousSibling.style[ this.sizeKey ] = `${ previousContainerSize }%`;
+            this.nextSibling.style[ this.sizeKey ] = `${ nextContainerSize }%`;
         }
     }
 };
