@@ -91,7 +91,7 @@ export class ResizeService {
                 } else {
                     container.style.height = "100%";
                 }
-                container.style[ this.size ] = `${ initSize - this.separatorSize / 2 }px`;
+                container.style[ this.size ] = `${ initSize - this.separatorSize * ( this.containers.length - 1 ) / this.containers.length }px`;
 
             } );
         } else {
