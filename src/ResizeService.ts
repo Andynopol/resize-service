@@ -82,13 +82,23 @@ export class ResizeService {
         }
     }
 
-    public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
+    public init ( appendCss?: boolean, initSize?: number | Array<number>, log?: boolean ) {
         this.addSeparators();
         this.addClasses();
         appendCss && ( () => { this.appendDefaultCSS(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
             this.renderInitSize( 100 / this.containers.length );
+
+        this.mantainRatio();
+    }
+
+    public mantainRatio () {
+        const resizeObserver = new ResizeObserver( () => {
+            this.containers[ this.containers.length - 1 ].style[ this.sizeKey ] = `${ 100 - getProcentage( this.context[ this.offsetSizeKey ],
+                this.containers.slice( 0, -1 ).reduce( ( accumulator, container ) => accumulator + container[ this.offsetSizeKey ], 0 ) - this.containers.length - 1 * this.separatorSize ) }%`;
+        } );
+        resizeObserver.observe( this.context );
     }
 
     private createSeparator () {
@@ -118,7 +128,7 @@ export class ResizeService {
         this._dragging = false;
         delete this.previousSibling;
         delete this.nextSibling;
-        this.context.style.cursor = "default";
+        this.context.style.cursor = "inherit";
     }
 
     private moveSeparator ( e: MouseEvent ) {
@@ -134,7 +144,7 @@ export class ResizeService {
                 sumOfPreviousContainersSize ) - ( this.previousSibling === this.containers[ 0 ] ? .5 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) : 2 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) );
             const nextContainerSize = (
                 getProcentage( this.context[ this.offsetSizeKey ], this.nextSibling[ this.offsetSizeKey ] +
-                    this.previousSibling[ this.offsetSizeKey ] ) - previousContainerSize + .25 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) );
+                    this.previousSibling[ this.offsetSizeKey ] ) - previousContainerSize + 1.25 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) );
             this.previousSibling.style[ this.sizeKey ] = `${ previousContainerSize }%`;
             this.nextSibling.style[ this.sizeKey ] = `${ nextContainerSize }%`;
         }
