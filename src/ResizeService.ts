@@ -63,7 +63,7 @@ export class ResizeService {
 
     private addClasses () {
         this.context.classList.add( "resize-main-context", `${ this.orientation }-resize-context` );
-        this.containers.forEach( container => container.classList.add( "resize-container" ) );
+        this.containers.forEach( container => container.classList.add( "resize-container", `${ this.orientation }-resize-container` ) );
     }
 
     private renderInitSize ( initSize: number | Array<number> ) {
@@ -128,15 +128,13 @@ export class ResizeService {
                 this.containers.indexOf( this.previousSibling ) ).reduce(
                     ( accumulator, container ) => accumulator + container[ this.offsetSizeKey ]
                     , 0 ) );
-            console.log( sumOfPreviousContainersSize );
             const previousContainerSize = (
                 getProcentage( this.context[ this.offsetSizeKey ], e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
                     this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] ) -
                 sumOfPreviousContainersSize ) - ( this.previousSibling === this.containers[ 0 ] ? .5 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) : 2 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) );
             const nextContainerSize = (
                 getProcentage( this.context[ this.offsetSizeKey ], this.nextSibling[ this.offsetSizeKey ] +
-                    this.previousSibling[ this.offsetSizeKey ] ) -
-                previousContainerSize );
+                    this.previousSibling[ this.offsetSizeKey ] ) - previousContainerSize + .25 * getProcentage( this.context[ this.offsetSizeKey ], this.separatorSize * ( this.containers.length - 1 ) / this.containers.length ) );
             this.previousSibling.style[ this.sizeKey ] = `${ previousContainerSize }%`;
             this.nextSibling.style[ this.sizeKey ] = `${ nextContainerSize }%`;
         }
