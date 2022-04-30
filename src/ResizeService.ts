@@ -145,8 +145,9 @@ export class ResizeService {
         new ResizeObserver( () => {
             if ( this.context[ this.offsetSizeKey ] > this.containers.reduce( ( acc, container ) => acc + container[ this.offsetSizeKey ], 0 ) + this.containers.length - 1 * this.separatorSize ) {
                 this.containers.forEach( ( container ) => {
-                    const containerProcentage = getProcentage( this.context[ this.offsetSizeKey ], container[ this.offsetSizeKey ] );
-                    container.style[ this.sizeKey ] = `${ container[ this.offsetSizeKey ] + ( this.context[ this.offsetSizeKey ] - this.containers.reduce( ( acc, container ) => acc + container[ this.offsetSizeKey ], 0 ) + this.containers.length - 1 * this.separatorSize ) / this.containers.length }px`;
+                    // container.style[ this.sizeKey ] = `${ container[ this.offsetSizeKey ] + ( this.context[ this.offsetSizeKey ] - this.containers.reduce( ( acc, container ) => acc + container[ this.offsetSizeKey ], 0 ) + this.containers.length - 1 * this.separatorSize ) / this.containers.length }px`;
+                    container.style[ this.sizeKey ] = `calc(${ getProcentage( this.context[ this.offsetSizeKey ], container[ this.offsetSizeKey ] + this.separatorSize / 2 ) }%-${ this.separatorSize / 2 }px)`;
+                    console.log( this.context[ this.offsetSizeKey ], container[ this.offsetSizeKey ] );
                 } );
             }
         } ).observe( this.context );
