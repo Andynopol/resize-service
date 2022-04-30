@@ -91,20 +91,19 @@ export class ResizeService {
     }
 
     public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
+        this.applyRules();
         this.addSeparators();
         this.addClasses();
         appendCss && ( () => { this.appendDefaultCSS(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
             this.renderInitSize( this.context[ this.offsetSizeKey ] / this.containers.length );
-        if ( this.rules && this.rules.global.startup.keepBounderies ) {
-            this.watchResize();
-        }
     }
 
     private createSeparator () {
         const separatorElement = document.createElement( 'div' );
         separatorElement.classList.add( 'resize-separator', `${ this.orientation }-resize-separator` );
+        separatorElement.style[ this.sizeKey ] = `${ this.separatorSize }px`;
         return separatorElement;
     }
 
@@ -137,7 +136,7 @@ export class ResizeService {
         if ( this._dragging ) {
             const siblingsTotalSize = this.previousSibling[ this.offsetSizeKey ] + this.nextSibling[ this.offsetSizeKey ] + this.separatorSize / 2;
             const previousContainerSize = (
-                e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
+                e[ this.orientation === "vertical" ? "clientY" : "clientX" ] -
                 this.previousSibling.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] - this.separatorSize / 2 );
             const nextContainerSize = ( siblingsTotalSize - previousContainerSize );
             this.previousSibling.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], previousContainerSize ) }%`;
@@ -153,5 +152,20 @@ export class ResizeService {
             } );
             this.contextSize = this.context[ this.offsetSizeKey ];
         } ).observe( this.context );
+    }
+
+    private applyRules () {
+        this.applyStartupRules();
+    }
+
+    private applyStartupRules () {
+        let startupRules: ConstraintValueObject<any>;
+        this.rules?.global?.startup && ( startupRules = this.rules?.global?.startup );
+        if ( startupRules?.keepBounderies ) {
+            this.watchResize();
+        }
+        if ( startupRules?.separatorSize ) {
+            this.separatorSize = startupRules.separatorSize;
+        }
     }
 };
