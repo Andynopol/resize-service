@@ -1,13 +1,13 @@
 import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
 import { SizeKey } from "./constants/enum";
-import { ConstraintValueObject } from "./constants/interfaces";
+import { ConstraintValueObject, Rules } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
-import { capitalize } from "./utils/script";
+import { capitalize, getProcentage } from "./utils/script";
 
 export class ResizeService {
     private _context: HTMLElement;
     private _containers: Array<HTMLElement>;
-    private _rules: ConstraintValueObject<any>;
+    private _rules: Rules;
     private _orientation: Orientation;
     private _separatorSize: number = 8;
 
@@ -17,10 +17,9 @@ export class ResizeService {
     private sizeKey: "width" | "height";
     private offsetSizeKey: string;
 
-    constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: ConstraintValueObject<any> ) {
+    constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules ) {
         this._context = context;
         this._containers = containers;
-        this._rules = rules;
         this._orientation = orientation;
         this.sizeKey = SizeKey[ orientation ];
         this.offsetSizeKey = `offset${ capitalize( this.sizeKey ) }`;
@@ -43,8 +42,8 @@ export class ResizeService {
         return this._separatorSize;
     }
 
-    private get size () {
-        return this.sizeKey;
+    get rules () {
+        return this._rules;
     }
 
     set containers ( containers: Array<HTMLElement> ) {
@@ -53,6 +52,10 @@ export class ResizeService {
 
     set separatorSize ( size: number ) {
         this._separatorSize = size;
+    }
+
+    set rules ( rules: Rules ) {
+        this.rules = rules;
     }
 
     private appendDefaultCSS () {
@@ -69,16 +72,17 @@ export class ResizeService {
     }
 
     private renderInitSize ( initSize: number | Array<number> ) {
-        let contextSize = this.context[ this.offsetSizeKey ];
+        this.containers.forEach( ( container ) => {
+            if ( this.orientation === "vertical" ) {
+                container.style.width = "100%";
+            } else {
+                container.style.height = "100%";
+            }
+        } );
         if ( typeof initSize === 'number' ) {
-            this.containers.forEach( ( container ) => {
-                if ( this.orientation === "vertical" ) {
-                    container.style.width = "100%";
-                } else {
-                    container.style.height = "100%";
-                }
-                container.style[ this.size ] = `${ initSize - this.separatorSize / 2 }px`;
-
+            this.containers.forEach( ( container, index ) => {
+                ( index !== 0 && index !== this.containers.length - 1 ) && ( container.style[ this.sizeKey ] = `${ initSize - this.separatorSize }px` );
+                ( index === 0 || index === this.containers.length - 1 ) && ( container.style[ this.sizeKey ] = `${ initSize - this.separatorSize / 2 }px` );
             } );
         } else {
             //render for array of values
@@ -91,7 +95,7 @@ export class ResizeService {
         initSize ?
             this.renderInitSize( initSize ) :
             this.renderInitSize( this.context[ this.offsetSizeKey ] / this.containers.length );
-
+        this?.rules?.global?.startup?.keepBoundries && this.watchResize();
     }
 
     private createSeparator () {
@@ -127,20 +131,24 @@ export class ResizeService {
 
     private moveSeparator ( e: MouseEvent ) {
         if ( this._dragging ) {
-            const sumOfPreviousContainersSize = this.containers.slice( 0,
-                this.containers.indexOf( this.previousSibling ) ).reduce(
-                    ( accumulator, container ) => accumulator + container[ this.offsetSizeKey ]
-                    , 0 ) + this.separatorSize;
+            const siblingsTotalSize = this.previousSibling[ this.offsetSizeKey ] + this.nextSibling[ this.offsetSizeKey ] + this.separatorSize / 2;
             const previousContainerSize = (
                 e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
-                this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] -
-                sumOfPreviousContainersSize );
-            const nextContainerSize = (
-                this.nextSibling[ this.offsetSizeKey ] +
-                this.previousSibling[ this.offsetSizeKey ] -
-                previousContainerSize );
-            this.previousSibling.style[ this.size ] = `${ previousContainerSize }px`;
-            this.nextSibling.style[ this.size ] = `${ nextContainerSize }px`;
+                this.previousSibling.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] - this.separatorSize / 2 );
+            const nextContainerSize = ( siblingsTotalSize - previousContainerSize );
+            this.previousSibling.style[ this.sizeKey ] = `${ previousContainerSize }px`;
+            this.nextSibling.style[ this.sizeKey ] = `${ nextContainerSize }px`;
         }
+    }
+
+    private watchResize () {
+        new ResizeObserver( () => {
+            if ( this.context[ this.offsetSizeKey ] > this.containers.reduce( ( acc, container ) => acc + container[ this.offsetSizeKey ], 0 ) + this.containers.length - 1 * this.separatorSize ) {
+                this.containers.forEach( ( container ) => {
+                    const containerProcentage = getProcentage( this.context[ this.offsetSizeKey ], container[ this.offsetSizeKey ] );
+                    container.style[ this.sizeKey ] = `${ container[ this.offsetSizeKey ] + ( this.context[ this.offsetSizeKey ] - this.containers.reduce( ( acc, container ) => acc + container[ this.offsetSizeKey ], 0 ) + this.containers.length - 1 * this.separatorSize ) / this.containers.length }px`;
+                } );
+            }
+        } ).observe( this.context );
     }
 };

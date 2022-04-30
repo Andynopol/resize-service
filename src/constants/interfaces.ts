@@ -7,8 +7,13 @@ export interface DedicatedValueResize {
     dimension: string;
 }
 
+interface GlobalRules {
+    startup: ConstraintValueObject<any>;
+    runtime: ConstraintValueObject<any>;
+}
+
 export interface Rules {
-    global: ConstraintValueObject<any>;
-    dedicated: Array<ConstraintValueObject<any>>;
+    global: GlobalRules;
+    dedicated: Array<GlobalRules>;
 
 }
