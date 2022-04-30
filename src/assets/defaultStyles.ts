@@ -29,4 +29,3 @@ export const HORIZONTAL_DEDICATED_STYLE = `
         cursor: ew-resize;
     }
 `;
-
