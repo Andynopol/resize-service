@@ -12,16 +12,18 @@ export class ResizeService {
     private _separatorSize: number = 8;
 
     private _dragging: Boolean = false;
-    private _previousSibling: HTMLElement;
-    private _nextSibling: HTMLElement;
-    private _size: "width" | "height";
+    private previousSibling: HTMLElement;
+    private nextSibling: HTMLElement;
+    private sizeKey: "width" | "height";
+    private offsetSizeKey: string;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: ConstraintValueObject<any> ) {
         this._context = context;
         this._containers = containers;
         this._rules = rules;
         this._orientation = orientation;
-        this._size = SizeKey[ orientation ];
+        this.sizeKey = SizeKey[ orientation ];
+        this.offsetSizeKey = `offset${ capitalize( this.sizeKey ) }`;
         this._rules = rules;
     }
 
@@ -42,48 +44,32 @@ export class ResizeService {
     }
 
     private get size () {
-        return this._size;
-    }
-
-    private get previousSibling () {
-        return this._previousSibling;
-    }
-
-    private get nextSibling () {
-        return this._nextSibling;
+        return this.sizeKey;
     }
 
     set containers ( containers: Array<HTMLElement> ) {
         this._containers = containers;
     }
 
-
     set separatorSize ( size: number ) {
         this._separatorSize = size;
-    }
-
-    private set previousSibling ( element: HTMLElement ) {
-        this._previousSibling = element;
-    }
-
-    private set nextSibling ( element: HTMLElement ) {
-        this._nextSibling = element;
     }
 
     private appendDefaultCSS () {
         const styles = document.createElement( 'style' );
         styles.textContent = styles.textContent + DEFAULT_STYLE;
-        this.orientation === "vertical" && ( styles.textContent = styles.textContent + VERTICAL_DEDICATED_STYLE );
-        this.orientation === "horizontal" && ( styles.textContent = styles.textContent + HORIZONTAL_DEDICATED_STYLE );
+        styles.textContent = styles.textContent + VERTICAL_DEDICATED_STYLE;
+        styles.textContent = styles.textContent + HORIZONTAL_DEDICATED_STYLE;
         this.context.appendChild( styles );
     }
 
     private addClasses () {
-        this._context.id = "resize-main-context";
-        this._containers.forEach( container => container.classList.add( "resize-container" ) );
+        this.context.classList.add( "resize-main-context", `${ this.orientation }-resize-context` );
+        this.containers.forEach( container => container.classList.add( "resize-container", `${ this.orientation }-resize-container` ) );
     }
 
     private renderInitSize ( initSize: number | Array<number> ) {
+        let contextSize = this.context[ this.offsetSizeKey ];
         if ( typeof initSize === 'number' ) {
             this.containers.forEach( ( container ) => {
                 if ( this.orientation === "vertical" ) {
@@ -91,7 +77,7 @@ export class ResizeService {
                 } else {
                     container.style.height = "100%";
                 }
-                container.style[ this.size ] = `${ initSize - this.separatorSize * this.containers.length - 1 / this.containers.length }px`;
+                container.style[ this.size ] = `${ initSize - this.separatorSize / 2 }px`;
 
             } );
         } else {
@@ -100,17 +86,17 @@ export class ResizeService {
     }
 
     public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
+        this.addSeparators();
         appendCss && ( () => { this.appendDefaultCSS(); this.addClasses(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
-            this.renderInitSize( this.context[ `offset${ capitalize( this.size ) }` ] / this.containers.length );
+            this.renderInitSize( this.context[ this.offsetSizeKey ] / this.containers.length );
 
     }
 
     private createSeparator () {
         const separatorElement = document.createElement( 'div' );
-        separatorElement.classList.add( 'resize-separator' );
-        separatorElement.style[ this.size ] = `${ this.separatorSize }px`;
+        separatorElement.classList.add( 'resize-separator', `${ this.orientation }-resize-separator` );
         return separatorElement;
     }
 
@@ -124,6 +110,7 @@ export class ResizeService {
 
     private activateSeparator ( e: MouseEvent ) {
         e.preventDefault();
+        this.context.style.cursor = this.orientation === "vertical" ? "ns-resize" : "ew-resize";
         this.previousSibling = ( e.target as HTMLElement ).previousElementSibling as HTMLElement;
         this.nextSibling = ( e.target as HTMLElement ).nextElementSibling as HTMLElement;
         this.context.addEventListener( 'mousemove', this.moveSeparator.bind( this ) );
@@ -135,21 +122,22 @@ export class ResizeService {
         this._dragging = false;
         delete this.previousSibling;
         delete this.nextSibling;
+        this.context.style.cursor = "inherit";
     }
 
     private moveSeparator ( e: MouseEvent ) {
         if ( this._dragging ) {
             const sumOfPreviousContainersSize = this.containers.slice( 0,
                 this.containers.indexOf( this.previousSibling ) ).reduce(
-                    ( accumulator, container ) => accumulator + container[ `offset${ capitalize( this.size ) }` ] + this.separatorSize
-                    , 0 );
+                    ( accumulator, container ) => accumulator + container[ this.offsetSizeKey ]
+                    , 0 ) + this.separatorSize;
             const previousContainerSize = (
                 e[ this.orientation === "vertical" ? "pageY" : "pageX" ] -
                 this.context.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] -
                 sumOfPreviousContainersSize );
             const nextContainerSize = (
-                this.nextSibling[ `offset${ capitalize( this.size ) }` ] +
-                this.previousSibling[ `offset${ capitalize( this.size ) }` ] -
+                this.nextSibling[ this.offsetSizeKey ] +
+                this.previousSibling[ this.offsetSizeKey ] -
                 previousContainerSize );
             this.previousSibling.style[ this.size ] = `${ previousContainerSize }px`;
             this.nextSibling.style[ this.size ] = `${ nextContainerSize }px`;
