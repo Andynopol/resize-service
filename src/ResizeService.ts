@@ -17,6 +17,7 @@ export class ResizeService {
     private _sizeKey: "width" | "height";
     private _offsetSizeKey: string;
     private _contextSize: number;
+    private styles: HTMLElement;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules ) {
         this._context = context;
@@ -70,6 +71,27 @@ export class ResizeService {
 
     set rules ( rules: Rules ) {
         this.rules = rules;
+    }
+
+    public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
+        this.applyRules();
+        this.addSeparators();
+        this.addClasses();
+        appendCss && ( () => { this.appendDefaultCSS(); } )();
+        initSize ?
+            this.renderInitSize( initSize ) :
+            this.renderInitSize( this.contextSize / this.containers.length );
+    }
+
+    //! Removes style attribute on all containers. Designed to be called in disconnectedCallback/componentDidUnmount
+    public destructor () {
+        this.context.removeChild( this.styles );
+        const separators = [ ...( this.context.getElementsByClassName( "resize-separator" ) as any ) ];
+        separators.forEach( separator => this.context.removeChild( separator ) );
+        this.containers.forEach( container => {
+            container.removeAttribute( "rules" );
+            container.removeAttribute( "style" );
+        } );
     }
 
     public refreshContextSize () {
@@ -142,11 +164,11 @@ export class ResizeService {
     }
 
     private appendDefaultCSS () {
-        const styles = document.createElement( 'style' );
-        styles.textContent = styles.textContent + DEFAULT_STYLE;
-        styles.textContent = styles.textContent + VERTICAL_DEDICATED_STYLE;
-        styles.textContent = styles.textContent + HORIZONTAL_DEDICATED_STYLE;
-        this.context.appendChild( styles );
+        this.styles = document.createElement( 'style' );
+        this.styles.textContent = this.styles.textContent + DEFAULT_STYLE;
+        this.styles.textContent = this.styles.textContent + VERTICAL_DEDICATED_STYLE;
+        this.styles.textContent = this.styles.textContent + HORIZONTAL_DEDICATED_STYLE;
+        this.context.appendChild( this.styles );
     }
 
     private addClasses () {
@@ -169,16 +191,6 @@ export class ResizeService {
         } else {
             //render for array of values
         }
-    }
-
-    public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
-        this.applyRules();
-        this.addSeparators();
-        this.addClasses();
-        appendCss && ( () => { this.appendDefaultCSS(); } )();
-        initSize ?
-            this.renderInitSize( initSize ) :
-            this.renderInitSize( this.contextSize / this.containers.length );
     }
 
     private createSeparator () {
@@ -300,4 +312,5 @@ export class ResizeService {
         }
         return checkersResult;
     }
+
 };
