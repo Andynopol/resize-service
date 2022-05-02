@@ -1,5 +1,5 @@
 import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
-import { SizeKey } from "./constants/enum";
+import { ResizeCases, SizeKey } from "./constants/enum";
 import { Container, Rules, RuntimeWatcher } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
 import { capitalize, getProcentage } from "./utils/script";
@@ -76,6 +76,71 @@ export class ResizeService {
         this._contextSize = this.context[ this.offsetSizeKey ];
     }
 
+    public resize ( sizes: Array<number>, type: ResizeCases ) {
+        switch ( type ) {
+            case ResizeCases.exact:
+                this.resizeExact( sizes );
+                break;
+            case ResizeCases.procentage:
+                this.resizeProcentage( sizes );
+                break;
+            case ResizeCases.ratio:
+                this.resizeRatio( sizes );
+                break;
+            default:
+                throw new Error( "[resize-service]: Resize type error" );
+        }
+    }
+
+    private resizeExact ( sizes: Array<number> ) {
+        if ( this.containers.length !== sizes.length ) {
+            throw new Error( "[resize-service]: Resize array length missmatch" );
+        }
+        const sizesTotal = sizes.reduce( ( acc: number, size: number ) => acc += size, 0 );
+        if ( sizesTotal > this.contextSize ) {
+            throw new Error( "[resize-service]: Exact size out of bound" );
+        }
+        if ( this.contextSize !== sizesTotal ) {
+            sizes[ sizes.length - 1 ] += this.contextSize - sizesTotal;
+        }
+        this.dispatchResize( sizes );
+    }
+
+    private resizeProcentage ( sizes: Array<number> ) {
+        if ( this.containers.length !== sizes.length ) {
+            throw new Error( "[resize-service]: Resize array length missmatch" );
+        }
+        const sizesTotal = sizes.reduce( ( acc: number, size: number ) => acc += size, 0 );
+        if ( sizesTotal > 100 ) {
+            throw new Error( "[resize-service]: Procentage out of bound" );
+        }
+        if ( 100 !== sizesTotal ) {
+            sizes[ sizes.length - 1 ] += 100 - sizesTotal;
+        }
+        this.dispatchResize( sizes.map( size => this.contextSize * size / 100 ) );
+    }
+
+    private resizeRatio ( sizes: Array<number> ) {
+        if ( this.containers.length !== sizes.length ) {
+            throw new Error( "[resize-service]: Resize array length missmatch" );
+        }
+        const sizesTotal = sizes.reduce( ( acc: number, size: number ) => acc += size, 0 );
+        if ( sizesTotal > 1 ) {
+            throw new Error( "[resize-service]: Ratio out of bound" );
+        }
+        if ( 1 < sizesTotal ) {
+            sizes[ sizes.length - 1 ] += 1 - sizesTotal;
+        }
+
+        this.dispatchResize( sizes.map( size => this.contextSize * size ) );
+    }
+
+    private dispatchResize ( sizes: Array<number> ) {
+        sizes.forEach( ( size, index ) => {
+            this.containers[ index ].style[ this.sizeKey ] = `${ getProcentage( this.contextSize, size - this.separatorSize / 2 ) }%`;
+        } );
+    }
+
     private appendDefaultCSS () {
         const styles = document.createElement( 'style' );
         styles.textContent = styles.textContent + DEFAULT_STYLE;
@@ -99,7 +164,7 @@ export class ResizeService {
         } );
         if ( typeof initSize === 'number' ) {
             this.containers.forEach( ( container ) => {
-                container.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], initSize - this.separatorSize / 2 ) }%`;
+                container.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, initSize - this.separatorSize / 2 ) }%`;
             } );
         } else {
             //render for array of values
@@ -113,7 +178,7 @@ export class ResizeService {
         appendCss && ( () => { this.appendDefaultCSS(); } )();
         initSize ?
             this.renderInitSize( initSize ) :
-            this.renderInitSize( this.context[ this.offsetSizeKey ] / this.containers.length );
+            this.renderInitSize( this.contextSize / this.containers.length );
     }
 
     private createSeparator () {
@@ -158,13 +223,13 @@ export class ResizeService {
 
             if ( this.validateWatchers( this.previousSibling, previousContainerSize ) &&
                 this.validateWatchers( this.nextSibling, nextContainerSize ) ) {
-                this.previousSibling.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], previousContainerSize ) }%`;
-                this.nextSibling.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], nextContainerSize ) }%`;
+                this.previousSibling.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, previousContainerSize ) }%`;
+                this.nextSibling.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, nextContainerSize ) }%`;
             }
         }
     }
 
-    watchResize () {
+    private watchResize () {
         new ResizeObserver( () => {
             this.containers.forEach( container => {
                 if ( this.context[ this.offsetSizeKey ] > this.contextSize )
@@ -178,6 +243,8 @@ export class ResizeService {
         this.applyStartupRules();
         this.applyRuntimeRules();
         this.applyCustomRules();
+        //apply after all global rules
+        this.applyDedicatedRules();
     }
 
     private applyStartupRules () {
@@ -191,23 +258,31 @@ export class ResizeService {
         }
     }
 
-    private applyCustomRules () {
-        const startupConfigs = this.rules?.global?.configurations;
-        if ( startupConfigs ) {
-            startupConfigs.forEach( config => {
-                config( this );
-            } );
-        }
+    private applyDedicatedRules () {
+        const { dedicated } = this?.rules;
+        if ( !dedicated || !dedicated.length ) return;
+
+        dedicated.forEach( ( { index, runtime } ) => {
+            ( this.containers[ index ] as Container ).rules = ( this.containers[ index ] as Container ).rules ? { ...( this.containers[ index ] as Container ).rules, ...runtime } : { ...runtime };
+        } );
     }
 
-    applyRuntimeRules () {
+    private applyCustomRules () {
+        const { configurations } = this.rules?.global;
+        if ( !configurations || !configurations.length ) return;
+        configurations.forEach( config => {
+            config( this );
+
+        } );
+    }
+
+    private applyRuntimeRules () {
         if ( !this?.rules?.global?.runtime ) {
             return;
         }
 
         this.containers.forEach( ( container: Container ) => {
             container.rules = { ...this.rules.global.runtime };
-            console.log( { ...container } );
         } );
     }
 
