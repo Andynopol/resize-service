@@ -1,6 +1,6 @@
 import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
 import { SizeKey } from "./constants/enum";
-import { Container, Rules, RuntimeChecker } from "./constants/interfaces";
+import { Container, Rules, RuntimeWatcher } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
 import { capitalize, getProcentage } from "./utils/script";
 
@@ -48,15 +48,15 @@ export class ResizeService {
         return this._rules;
     }
 
-    get offsetSizeKey() {
+    get offsetSizeKey () {
         return this._offsetSizeKey;
     }
 
-    get sizeKey() {
+    get sizeKey () {
         return this._sizeKey;
     }
 
-    get contextSize() {
+    get contextSize () {
         return this._contextSize;
     }
 
@@ -72,7 +72,7 @@ export class ResizeService {
         this.rules = rules;
     }
 
-    public refreshContextSize() {
+    public refreshContextSize () {
         this._contextSize = this.context[ this.offsetSizeKey ];
     }
 
@@ -156,8 +156,8 @@ export class ResizeService {
                 this.previousSibling.getBoundingClientRect()[ this.orientation === "vertical" ? "top" : "left" ] - this.separatorSize / 2 );
             const nextContainerSize = ( siblingsTotalSize - previousContainerSize );
 
-            if (this.validateChecker(this.previousSibling, previousContainerSize) && 
-            this.validateChecker(this.nextSibling, nextContainerSize)) {
+            if ( this.validateWatchers( this.previousSibling, previousContainerSize ) &&
+                this.validateWatchers( this.nextSibling, nextContainerSize ) ) {
                 this.previousSibling.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], previousContainerSize ) }%`;
                 this.nextSibling.style[ this.sizeKey ] = `${ getProcentage( this.context[ this.offsetSizeKey ], nextContainerSize ) }%`;
             }
@@ -191,35 +191,34 @@ export class ResizeService {
         }
     }
 
-    private applyCustomRules() {
+    private applyCustomRules () {
         const startupConfigs = this.rules?.global?.configurations;
-        if (startupConfigs) {
-            startupConfigs.forEach(config => {
-                config(this);
-            })
+        if ( startupConfigs ) {
+            startupConfigs.forEach( config => {
+                config( this );
+            } );
         }
     }
 
-    applyRuntimeRules(){
-        if(!this?.rules?.global?.runtime){
+    applyRuntimeRules () {
+        if ( !this?.rules?.global?.runtime ) {
             return;
         }
 
-        this.containers.forEach((container: Container)=>{
-            container.rules = {...this.rules.global.runtime};
-            console.log({...container});
-        })
+        this.containers.forEach( ( container: Container ) => {
+            container.rules = { ...this.rules.global.runtime };
+            console.log( { ...container } );
+        } );
     }
 
-    private validateChecker(container: Container, containerSize: number) {
-        const runtimeCheckers: Array<RuntimeChecker> = this.rules?.global?.checkers;
+    private validateWatchers ( container: Container, containerSize: number ) {
+        const runtimeCheckers: Array<RuntimeWatcher> = this.rules?.global?.watchers;
         let checkersResult = true;
-        if (runtimeCheckers) {
-            runtimeCheckers.forEach(runtimeChecker => {
-                checkersResult = checkersResult && runtimeChecker(container, containerSize)
-            })
+        if ( runtimeCheckers ) {
+            runtimeCheckers.forEach( runtimeChecker => {
+                checkersResult = checkersResult && runtimeChecker( container, containerSize );
+            } );
         }
-
         return checkersResult;
     }
 };

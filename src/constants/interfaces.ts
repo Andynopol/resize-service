@@ -13,15 +13,14 @@ interface GlobalRules {
     startup: ConstraintValueObject<any>;
     runtime?: ConstraintValueObject<any>;
     configurations?: Array<StartupConfig>;
-    checkers?: Array<RuntimeChecker>;
+    watchers?: Array<RuntimeWatcher>;
 }
 
 interface DedicatedRules {
     runtime?: ConstraintValueObject<any>;
-    checkers: Array<RuntimeChecker>;
 }
 
-export interface RuntimeChecker {
+export interface RuntimeWatcher {
     ( container: Container, size?: number ): boolean;
 }
 
