@@ -210,6 +210,8 @@ export class ResizeService {
         this._dragging = false;
         delete this.previousSibling;
         delete this.nextSibling;
+        this.context.removeEventListener( 'mousemove', this.moveSeparator.bind( this ) );
+        this.context.removeEventListener( 'mouseup', this.deactivateSeparator.bind( this ) );
         this.context.style.cursor = "inherit";
     }
 
@@ -225,6 +227,8 @@ export class ResizeService {
                 this.validateWatchers( this.nextSibling, nextContainerSize ) ) {
                 this.previousSibling.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, previousContainerSize ) }%`;
                 this.nextSibling.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, nextContainerSize ) }%`;
+            } else {
+                this.deactivateSeparator();
             }
         }
     }
