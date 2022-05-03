@@ -7,3 +7,9 @@ export enum SizeKey {
     "vertical" = "height",
     "horizontal" = "width",
 }
+
+export enum ResizeCases {
+    exact = "exact",
+    ratio = "ratio",
+    procentage = "procentage",
+}

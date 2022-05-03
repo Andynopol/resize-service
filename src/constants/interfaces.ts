@@ -18,7 +18,7 @@ interface GlobalRules {
 
 interface DedicatedRules {
     index: number;
-    runtime?: ConstraintValueObject<any>;
+    runtime: ConstraintValueObject<any>;
 }
 
 export interface RuntimeWatcher {
