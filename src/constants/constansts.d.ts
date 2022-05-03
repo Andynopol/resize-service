@@ -1,4 +1,4 @@
-import { ResizeService } from "../ResizeService";
+import { ResizeService } from "./ResizeService";
 
 interface ConstraintValueObject<Type> {
     [ key: string ]: Type;
