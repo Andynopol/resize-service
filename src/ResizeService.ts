@@ -2,7 +2,7 @@ import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } f
 import { ResizeCases, SizeKey } from "./constants/enum";
 import { Container, Rules, RuntimeWatcher, ConstraintValueObject } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
-import { capitalize, getProcentage } from "./utils/script";
+import { capitalize, getProcentage } from "./utils/scripts";
 
 export class ResizeService {
     private _context: HTMLElement;
