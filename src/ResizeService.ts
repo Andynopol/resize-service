@@ -275,6 +275,9 @@ export class ResizeService {
     }
 
     private applyDedicatedRules () {
+        if ( !this?.rules?.dedicated ) {
+            return;
+        }
         const { dedicated } = this?.rules;
         if ( !dedicated || !dedicated.length ) return;
 
@@ -284,7 +287,10 @@ export class ResizeService {
     }
 
     private applyCustomRules () {
-        const { configurations } = this.rules?.global;
+        if ( !this?.rules?.global?.configurations ) {
+            return;
+        }
+        const { configurations } = this?.rules?.global;
         if ( !configurations || !configurations.length ) return;
         configurations.forEach( config => {
             config( this );
