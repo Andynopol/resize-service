@@ -1,8 +1,8 @@
 import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
-import { ResizeCases, SizeKey } from "./constants/enum";
+import { ResizeCases, SizeKey, OffsetSizeKey } from "./constants/enum";
 import { Container, Rules, RuntimeWatcher, ConstraintValueObject } from "./constants/interfaces";
 import { Orientation } from "./constants/types";
-import { capitalize, getProcentage } from "./utils/scripts";
+import { getProcentage } from "./utils/scripts";
 
 export class ResizeService {
     private _context: HTMLElement;
@@ -14,8 +14,8 @@ export class ResizeService {
     private _dragging: Boolean = false;
     private previousSibling: HTMLElement;
     private nextSibling: HTMLElement;
-    private _sizeKey: "width" | "height";
-    private _offsetSizeKey: string;
+    private _sizeKey: SizeKey;
+    private _offsetSizeKey: OffsetSizeKey;
     private _contextSize: number;
     private styles: HTMLElement;
 
@@ -24,7 +24,7 @@ export class ResizeService {
         this._containers = ( containers as Array<Container> );
         this._orientation = orientation;
         this._sizeKey = SizeKey[ orientation ];
-        this._offsetSizeKey = `offset${ capitalize( this.sizeKey ) }`;
+        this._offsetSizeKey = OffsetSizeKey[ orientation ];
         this._rules = rules;
         this._contextSize = this.context[ this.offsetSizeKey ];
     }

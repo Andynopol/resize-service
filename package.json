@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && cp src/ResizeService.d.ts dist/ && cp src/constants/constansts.d.ts dist/"
+    "build": "tsc && cp src/ResizeService.d.ts dist/ && cp src/constansts.d.ts dist/"
   },
   "repository": {
     "type": "git",
