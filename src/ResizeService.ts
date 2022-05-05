@@ -159,7 +159,8 @@ export class ResizeService {
 
     private dispatchResize ( sizes: Array<number> ) {
         sizes.forEach( ( size, index ) => {
-            this.containers[ index ].style[ this.sizeKey ] = `${ getProcentage( this.contextSize, size - this.separatorSize / 2 ) }%`;
+            const procentage = getProcentage( this.contextSize, size - this.separatorSize / 2 );
+            this.containers[ index ].style[ this.sizeKey ] = `${ procentage > 0 ? procentage : 0 }%`;
         } );
     }
 
