@@ -8,6 +8,11 @@ export enum SizeKey {
     "horizontal" = "width",
 }
 
+export enum OffsetSizeKey {
+    "vertical" = "offsetHeight",
+    "horizontal" = "offsetWidth"
+}
+
 export enum ResizeCases {
     exact = "exact",
     ratio = "ratio",

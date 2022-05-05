@@ -17,6 +17,11 @@ export declare enum SizeKey {
     "horizontal" = "width",
 }
 
+export declare enum OffsetSizeKey {
+    "vertical" = "offesetHeight",
+    "horizontal" = "offsetWidth"
+}
+
 export declare type Orientation = "vertical" | "horizontal";
 
 export declare interface DedicatedValueResize {
