@@ -176,7 +176,7 @@ export class ResizeService {
         this.containers.forEach( container => container.classList.add( "resize-container", `${ this.orientation }-resize-container` ) );
     }
 
-    private renderInitSize ( initSize: number | Array<number> ) {
+    private renderInitSize ( initSize: number | Array<number>, type: ResizeCases = ResizeCases.exact ) {
         this.containers.forEach( ( container ) => {
             if ( this.orientation === "vertical" ) {
                 container.style.width = "100%";
@@ -185,11 +185,10 @@ export class ResizeService {
             }
         } );
         if ( typeof initSize === 'number' ) {
-            this.containers.forEach( ( container ) => {
-                container.style[ this.sizeKey ] = `${ getProcentage( this.contextSize, initSize - this.separatorSize / 2 ) }%`;
-            } );
+            this.resize( this.containers.map( () => initSize ), type );
         } else {
             //render for array of values
+            this.resize( initSize, type );
         }
     }
 
