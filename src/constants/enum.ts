@@ -1,19 +1,19 @@
-export enum ResizeSelectors {
+export enum _ResizeSelectors {
     contextId = "resize-main-context",
     containersClass = "resize-container"
 }
 
-export enum SizeKey {
+export enum _SizeKey {
     "vertical" = "height",
     "horizontal" = "width",
 }
 
-export enum OffsetSizeKey {
+export enum _OffsetSizeKey {
     "vertical" = "offsetHeight",
     "horizontal" = "offsetWidth"
 }
 
-export enum ResizeCases {
+export enum _ResizeCases {
     exact = "exact",
     ratio = "ratio",
     procentage = "procentage",
