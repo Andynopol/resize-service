@@ -27,7 +27,7 @@ export declare class ResizeService {
 
   set rules ( rules: Rules );
 
-  init ( appendCss?: boolean, initSize?: number | Array<number> ): void;
+  init ( appendCss?: boolean, initSize?: number | Array<number>, type?: ResizeCases ): void;
   resize ( sizes: Array<number>, type: ResizeCases ): void;
   refreshContextSize (): void;
   destructor (): void;

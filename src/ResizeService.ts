@@ -1,7 +1,7 @@
 import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
-import { ResizeCases, SizeKey, OffsetSizeKey } from "./constants/enum";
+import { _ResizeCases, _SizeKey, _OffsetSizeKey } from "./constants/enum";
 import { Container, Rules, RuntimeWatcher, ConstraintValueObject } from "./constants/interfaces";
-import { Orientation } from "./constants/types";
+import { Orientation, SizeKey, OffsetSizeKey, ResizeCases } from "./constants/types";
 import { getProcentage } from "./utils/scripts";
 
 export class ResizeService {
@@ -23,8 +23,8 @@ export class ResizeService {
         this._context = context;
         this._containers = ( containers as Array<Container> );
         this._orientation = orientation;
-        this._sizeKey = SizeKey[ orientation ];
-        this._offsetSizeKey = OffsetSizeKey[ orientation ];
+        this._sizeKey = _SizeKey[ orientation ];
+        this._offsetSizeKey = _OffsetSizeKey[ orientation ];
         this._rules = rules;
         this._contextSize = this.context[ this.offsetSizeKey ];
     }
@@ -100,13 +100,13 @@ export class ResizeService {
 
     public resize ( sizes: Array<number>, type: ResizeCases ) {
         switch ( type ) {
-            case ResizeCases.exact:
+            case _ResizeCases.exact:
                 this.resizeExact( sizes );
                 break;
-            case ResizeCases.procentage:
+            case _ResizeCases.procentage:
                 this.resizeProcentage( sizes );
                 break;
-            case ResizeCases.ratio:
+            case _ResizeCases.ratio:
                 this.resizeRatio( sizes );
                 break;
             default:
@@ -177,7 +177,7 @@ export class ResizeService {
         this.containers.forEach( container => container.classList.add( "resize-container", `${ this.orientation }-resize-container` ) );
     }
 
-    private renderInitSize ( initSize: number | Array<number>, type: ResizeCases = ResizeCases.exact ) {
+    private renderInitSize ( initSize: number | Array<number>, type: ResizeCases = _ResizeCases.exact ) {
         this.containers.forEach( ( container ) => {
             if ( this.orientation === "vertical" ) {
                 container.style.width = "100%";

@@ -1,28 +1,18 @@
 import { ResizeService } from "./ResizeService";
 import { ConstraintValueObject } from './constants/interfaces';
 
-export declare enum ResizeCases {
-    exact = "exact",
-    ratio = "ratio",
-    procentage = "procentage",
-}
-
 export declare enum ResizeSelectors {
     contextId = "resize-main-context",
     containersClass = "resize-container"
 }
 
-export declare enum SizeKey {
-    "vertical" = "height",
-    "horizontal" = "width",
-}
+export type Orientation = "vertical" | "horizontal";
 
-export declare enum OffsetSizeKey {
-    "vertical" = "offesetHeight",
-    "horizontal" = "offsetWidth"
-}
+export type OffsetSizeKey = "offsetHeight" | "offsetWidth";
 
-export declare type Orientation = "vertical" | "horizontal";
+export type SizeKey = "height" | "width";
+
+export type ResizeCases = "exact" | "ratio" | "procentage";
 
 export declare interface DedicatedValueResize {
     value: number;
