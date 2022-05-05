@@ -73,14 +73,14 @@ export class ResizeService {
         this.rules = rules;
     }
 
-    public init ( appendCss?: boolean, initSize?: number | Array<number> ) {
+    public init ( appendCss?: boolean, initSize?: number | Array<number>, type?: ResizeCases ) {
         this.applyRules();
         this.addSeparators();
         this.addClasses();
         appendCss && ( () => { this.appendDefaultCSS(); } )();
         initSize ?
-            this.renderInitSize( initSize ) :
-            this.renderInitSize( this.contextSize / this.containers.length );
+            this.renderInitSize( initSize, type ) :
+            this.renderInitSize( this.contextSize / this.containers.length, type );
     }
 
     //! Removes style attribute on all containers. Designed to be called in disconnectedCallback/componentDidUnmount
