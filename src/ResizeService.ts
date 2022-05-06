@@ -1,4 +1,4 @@
-import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
+import { DEFAULT_STYLE, HORIZONTAL_DEDICATED_STYLE, SEPARATOR_DEFAULT_STYLE, VERTICAL_DEDICATED_STYLE } from "./assets/defaultStyles";
 import { _ResizeCases, _SizeKey, _OffsetSizeKey } from "./constants/enum";
 import { Container, Rules, RuntimeWatcher, ConstraintValueObject } from "./constants/interfaces";
 import { Orientation, SizeKey, OffsetSizeKey, ResizeCases } from "./constants/types";
@@ -77,7 +77,7 @@ export class ResizeService {
         this.applyRules();
         this.addSeparators();
         this.addClasses();
-        appendCss && ( () => { this.appendDefaultCSS(); } )();
+        this.appendDefaultCSS( appendCss );
         initSize ?
             this.renderInitSize( initSize, type ) :
             this.renderInitSize( this.contextSize / this.containers.length, type );
@@ -164,11 +164,14 @@ export class ResizeService {
         } );
     }
 
-    private appendDefaultCSS () {
+    private appendDefaultCSS ( appendStyles?: boolean ) {
         this.styles = document.createElement( 'style' );
-        this.styles.textContent = this.styles.textContent + DEFAULT_STYLE;
-        this.styles.textContent = this.styles.textContent + VERTICAL_DEDICATED_STYLE;
-        this.styles.textContent = this.styles.textContent + HORIZONTAL_DEDICATED_STYLE;
+        this.styles.textContent = this.styles.textContent + SEPARATOR_DEFAULT_STYLE;
+        appendStyles && ( () => {
+            this.styles.textContent = this.styles.textContent + DEFAULT_STYLE;
+            this.styles.textContent = this.styles.textContent + VERTICAL_DEDICATED_STYLE;
+            this.styles.textContent = this.styles.textContent + HORIZONTAL_DEDICATED_STYLE;
+        } )();
         this.context.appendChild( this.styles );
     }
 
