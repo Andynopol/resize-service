@@ -21,7 +21,7 @@ export declare class ResizeService {
 
   get contextSize (): number;
 
-  set containers ( containers: Array<HTMLElement> );
+  set containers ( containers: Array<Container> );
 
   set separatorSize ( size: number );
 
