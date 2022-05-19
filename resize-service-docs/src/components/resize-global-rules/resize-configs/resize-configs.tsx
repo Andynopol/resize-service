@@ -1,6 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService } from "../../../../../dist/ResizeService";
-import { Container } from "../../../../../dist/constansts";
+import { ResizeService, Container } from "../../../../../dist/ResizeService";
 
 @Component( {
   tag: 'resize-configs',
