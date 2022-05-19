@@ -61,7 +61,7 @@ export class ResizeService {
         return this._contextSize;
     }
 
-    set containers ( containers: Array<HTMLElement> ) {
+    set containers ( containers: Array<Container> ) {
         this._containers = ( containers as Array<Container> );
     }
 
@@ -86,11 +86,13 @@ export class ResizeService {
     //! Removes style attribute on all containers. Designed to be called in disconnectedCallback/componentDidUnmount
     public destructor () {
         this.context.removeChild( this.styles );
+        this.context.classList.remove( "resize-main-context", `${ this.orientation }-resize-context` );
         const separators = [ ...( this.context.getElementsByClassName( "resize-separator" ) as any ) ];
         separators.forEach( separator => this.context.removeChild( separator ) );
         this.containers.forEach( container => {
             container.removeAttribute( "rules" );
             container.removeAttribute( "style" );
+            container.classList.remove( "resize-container", `${ this.orientation }-resize-container` );
         } );
     }
 
@@ -112,6 +114,12 @@ export class ResizeService {
             default:
                 throw new Error( "[resize-service]: Resize type error" );
         }
+    }
+
+    public updateRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ) {
+        payload.forEach( ( rule ) => {
+            this.containers[ rule.index ].rules = { ...this.containers[ rule.index ], ...rule.rules };
+        } );
     }
 
     private resizeExact ( sizes: Array<number> ) {
