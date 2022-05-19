@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService, Container } from "../../../../../dist/ResizeService";
+import { ResizeService, Container } from "../../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'max-size',
@@ -78,7 +78,7 @@ export class MaxSize {
                 </pre>
               </span>
             </div>
-            <span class="space-top">Each container has a max height of 200px.</span>
+            <span class="space-top">Both containers have a maxSize rule and a watcher that verifies that each of them will have a maximum size. When the max size is met, the separator stops.</span>
           </article>
         </div>
       </Host >

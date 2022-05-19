@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService, Container } from "../../../../../dist/ResizeService";
+import { ResizeService, Container } from "../../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'min-size',
@@ -79,7 +79,16 @@ export class MinSize {
                 </pre>
               </span>
             </div>
-            <span class="space-top">Each container has a min height of 20px.</span>
+            <span class="space-top">
+              { `Global Runtime rules can be any rules defined by the component that instantiates the Resize Service. These rules are applied on containers.` }
+              <br />
+              { `After declaring some runtime rules, there should also be declared some watchers for each of them. These watchers will return a boolean. When the user moves a separator` }
+              <br />
+              { `between 2 containers that have runtime rules defined, each watcher is called and if any of them returns false, the separator stops. If all of them return true, the separator moves.` }
+              <br />
+              <br />
+              { `In this example, both containers have a minSize rule and a watcher that verifies that each of them will have a minimum size. When the min size is met, the separator stops.` }
+            </span>
           </article>
         </div>
       </Host >
