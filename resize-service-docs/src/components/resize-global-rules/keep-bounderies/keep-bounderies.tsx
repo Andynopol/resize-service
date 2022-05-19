@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService } from "../../../../../dist/ResizeService";
+import { ResizeService } from "../../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'keep-bounderies',
@@ -29,8 +29,8 @@ export class KeepBounderies {
   render () {
     return (
       <Host>
+        <h2>2. Global Startup Rules</h2>
         <div class="case">
-          <h1>Global Startup Rules</h1>
           <h2>Keep bounderies</h2>
           <div class="context" ref={ el => this.context = el }>
             <div ref={ el => this.containers.push( el as HTMLElement ) && ( this.innerContext1 = el ) && this.addRandomCollor( el ) }>
@@ -80,7 +80,13 @@ export class KeepBounderies {
                 </pre>
               </span>
             </div>
-            <span class="space-top">The first container will not exceed its container bounderies.</span>
+            <span class="space-top">
+              { ` Startup rules will be applied automatically on init() method. These rules are stored in the Resize Service itself. Each Resize Service has two predefined startup rules:  ` }
+              <br />
+              { `  - keepBounderies: boolean. If its value is true, the container will not exceed the value of its wrapper when the user moves the separator;` }
+              <br />
+              { `  - separatorSize: number, the width/height of each separator (by default: 8px).` }
+            </span>
           </article>
         </div>
       </Host>

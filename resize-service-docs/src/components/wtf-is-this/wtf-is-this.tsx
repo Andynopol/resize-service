@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService } from "../../../../dist/ResizeService";
+import { ResizeService } from "../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'wtf-is-this',

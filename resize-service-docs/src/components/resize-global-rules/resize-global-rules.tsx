@@ -11,7 +11,7 @@ export class ResizeGlobalRules {
     return (
       <Host>
         <keep-bounderies />
-        <h1>Global Runtime Rules</h1>
+        <h2>3. Global Runtime Rules & Watchers</h2>
         <min-size />
         <max-size />
         <resize-configs />

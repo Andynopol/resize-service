@@ -20,19 +20,66 @@
 
 <body>
   <div>
-    <resize-display-options />
+    <h1>Resize Service Documentation</h1>
+    <div class="doc-section">
+      <h2>Resize Service API:</h2>
+      <h3 class="service-method">new ResizeService(context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules):</h3>
+      <p><b>context:</b> A wrapper for the containers. Mandatory.</p>
+      <p><b>containers:</b> The containers that should be separated by dragbars. Mandatory.</p>
+      <p><b>orientation?:</b> It can be "horizontal" or "vertical". By default, "vertical". Optional.</p>
+      <p><b>rules?:</b> {global, dedicated?}:</p>
+      <div class="rules-api">
+        <p><b>global:</b>{startup, runtime?, configurations?, watchers?}</p>
+        <div class="global">
+          <p><b>startup:</b> Object of initial rules that will be applied on all containers. Mandatory.</p>
+          <p><b>runtime?:</b> Object of rules that apply on containers inside a "rules" property. These offer constraints towards resize behaviour. Optional.</p>
+          <p><b>configurations?:</b> Array of functions that will be called only when the service is initialized. Optional.</p>
+          <p><b>watchers?:</b> Array of functions that will be called when the separator between the containers is moved. Based on the cumulated return value(boolean) of these functions, the resize stops or continues. Optional.</p>
+        </div>
+      </div>
+      <div class="rules-api">
+        <p><b>dedicated?:</b> Array of {index, runtime}:</p>
+        <div class="global">
+          <p><b>index:</b> the index of the container that will be affected. Mandatory.</p>
+          <p><b>runtime: </b>Object of rules that apply on the specified container. Mandatory.</p>
+        </div>
+      </div>
+      
+      <h3 class="service-method">init(appendCss?: boolean, initSize?: number | Array<number>, type?: ResizeCases):</h3>
+      <p><b>appendCSS?:</b>If true, use the CSS defined in the Resize Service class. In false, use the CSS defined by the component that uses the service.</p>
+      <p><b>initSize?: </b>The size for each container.</p>
+      <p><b>type?:</b> The type of the resize that will be applyed for each container. Values: "exact" | "ratio" | "procentage". If not specified, by default it will be "exact" (px).</p>
+    
+      <h3 class="service-method">destructor ():</h3>
+      <p>Removes style attribute on all containers and all separators from context. Designed to be called in disconnectedCallback/componentDidUnmount.</p>
+    
+      <h3 class="service-method">resize (sizes: Array<number>, type: ResizeCases):</h3>
+      <p><b>sizes: </b>The new size for each container.</p>
+      <p><b>type:</b> The type of the resize that will be applyed for each container. Values: "exact" | "ratio" | "procentage". If not specified, by default it will be "exact" (px).</p>
+    
+      <h3 class="service-method">refreshContextSize ():</h3>
+      <p>To keep the ratio of the containers when the context modifies its size, the Resize Service needs the previous context <b>width/height</b> to adapt the containers for the new one after resize(if the <b>keepBounderies</b> flag is true).</p>
+      <p>Therefor this function can be called to refresh the value of the size to the current one if the context size changes in a particular usecase.</p>
+    </div>
   </div>
+
   <div>
-    <resize-global-rules />
-  </div>
-  <div>
-    <resize-dedicated-rules />
-  </div>
-  <div>
-    <resize-functions />
-  </div>
-  <div>
-    <wtf-is-this />
+    <h2 class="doc-examples">Code and Functionalities Examples</h2>
+    <div class="doc-section">
+      <resize-display-options />
+    </div>
+    <div class="doc-section">
+      <resize-global-rules />
+    </div>
+    <div class="doc-section">
+      <resize-dedicated-rules />
+    </div>
+    <div class="doc-section">
+      <resize-functions />
+    </div>
+    <div>
+      <wtf-is-this />
+    </div>
   </div>
 </body>
 

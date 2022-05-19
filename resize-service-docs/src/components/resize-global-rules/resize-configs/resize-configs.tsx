@@ -1,6 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService } from "../../../../../dist/ResizeService";
-import { Container } from "../../../../../dist/constansts";
+import { ResizeService, Container } from "../../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'resize-configs',
@@ -46,8 +45,8 @@ export class ResizeConfigs {
   render () {
     return (
       <Host>
+        <h2>4. Configurations</h2>
         <div class="case">
-          <h1>Configurations</h1>
           <h2>Keep size</h2>
           <div class="context" ref={ el => this.context = el }>
             <div ref={ el => this.containers.push( el as HTMLElement ) && ( this.innerContext1 = el ) && this.addRandomCollor( el ) }>
@@ -102,20 +101,28 @@ export class ResizeConfigs {
                   <br />
                   { ` Watcher example:
 
-    watchMinSize ( container: Container, size: number ) {
-      const { minsize } = container.rules;
-      //the rules dose not apply for this container.
-      if ( !minsize ) return true;
-
-      if ( minsize > size ) {
-        return false;
-      }
-      return true;
+    watchResize(resizer: ResizeService) {
+        const { context, containers, rules } = resizer;
+        rules.global.startup.keepSize &&
+            (new ResizeObserver(() => {
+                containers.forEach(container => {
+                if (context[resizer.offsetSizeKey] > resizer.contextSize)
+                    container.style[resizer.sizeKey] = ${ `{this.getProcentage(resizer.contextSize, container[resizer.offsetSizeKey])}` }%;
+                });
+                resizer.refreshContextSize();
+            }).observe(context));
     }`}
                 </pre>
               </span>
             </div>
-            <span class="space-top">Each container has a min height of 20px.</span>
+            <span class="space-top">
+              { `Configurations can be added to define new global startup rules. These rules should also be added in the global.startup object when the Resize Service is initialized.` }
+              <br />
+              { `A configuration is a function that has no return value. It is called in the init() method.` }
+              <br />
+              <br />
+              { `In this example, a new keepSize startup rule is added with its watcher.` }
+            </span>
           </article>
         </div>
       </Host >

@@ -10,7 +10,7 @@ export class ResizeDisplayOptions {
   render() {
     return (
       <Host>
-        <h1>Containers Display Options</h1>
+        <h2>1. Containers Display Options</h2>
         <resize-vertical />
         <resize-horizontal />
       </Host>

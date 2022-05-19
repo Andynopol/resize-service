@@ -1,6 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { Container } from '../../../../dist/constansts';
-import { ResizeService } from "../../../../dist/ResizeService";
+import { ResizeService, Container } from "../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'resize-dedicated-rules',
@@ -35,8 +34,8 @@ export class ResizeDedicatedRules {
   render () {
     return (
       <Host>
+        <h2>5. Dedicated Rules</h2>
         <div class="case">
-          <h1>Dedicated Rules</h1>
           <h2>Dedicated max size</h2>
           <div class="context" ref={ el => this.context = el }>
             <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
@@ -62,10 +61,34 @@ export class ResizeDedicatedRules {
       <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
     </div>
             `}
+                  <br />
+                  <br />
+                  ==========================================================================================================================
+                  <br />
+                  <br />
+                  { ` Watcher example:
+    watchMaxSize ( container: Container, size: number ) {
+      const { maxsize } = container.rules;
+      //the rules dose not apply for this container.
+      if ( !maxsize ) return true;
+
+      if ( maxsize < size ) {
+        return false;
+      }
+      return true;
+    }
+  `}
                 </pre>
               </span>
             </div>
-            <span class="space-top">Overwrite the max height of the first container to 250px.</span>
+            <span class="space-top">
+              { `Dedicated rules are used to overwrite any runtime rule or add new runtime rules for a given container. These dedicated rules should be defined when the Resize Service is initialized.` }
+              <br />
+              { `We need to specify the index of the affected container, the runtime rules that will be modified and its new values.` }
+              <br />
+              <br />
+              { `In this example, the first container will have a different maximum size.` }
+            </span>
           </article>
         </div>
       </Host >

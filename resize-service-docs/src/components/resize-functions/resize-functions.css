@@ -7,8 +7,12 @@
   flex-direction: column;
 }
 
-#context{
+#context {
   border: 2px solid #757575;
-    width: 60%;
+  width: 60%;
   height: 60%;
+}
+
+h2 {
+  margin-top: 20px;
 }

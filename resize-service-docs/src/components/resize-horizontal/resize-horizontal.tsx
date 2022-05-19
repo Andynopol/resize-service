@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { ResizeService } from "../../../../dist/ResizeService";
+import { ResizeService } from "../../../../../resize-service/dist/ResizeService";
 
 @Component( {
   tag: 'resize-horizontal',
@@ -33,18 +33,27 @@ export class ResizeHorizontal {
             <div class="code">
               <span>
                 <pre>
-                  new ResizeService( this.context, this.containers, "horizontal" ).init( true );
+                  { ` Resize Service initialization:
+
+    new ResizeService( this.context, this.containers, "horizontal" ).init( true );
+                   `}
                   <br />
-                  { `
-                   <div class="context" ref={ el => this.context = el }>
-                   <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
-                   <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
-                 </div>
-            `}
+                  <br />
+                  ========================================================================================================================================================================
+                  <br />
+                  { ` JSX:
+
+    <div class="context" ref={ el => this.context = el }>
+        <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
+        <div ref={ el => this.containers.push( el as HTMLElement ) && this.addRandomCollor( el ) }></div>
+    </div>
+                `}
                 </pre>
               </span>
             </div>
-            <span class="space-top">Horizontal display of two containers.</span>
+            <span class="space-top">
+              { `In this example, we have two containers with horizontal display, separated by a dragbar.` }
+            </span>
           </article>
         </div>
       </Host>
