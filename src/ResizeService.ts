@@ -118,7 +118,7 @@ export class ResizeService {
 
     public updateRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ) {
         payload.forEach( ( rule ) => {
-            this.containers[ rule.index ].rules = { ...this.containers[ rule.index ], ...rule.rules };
+            this.containers[ rule.index ].rules = { ...this.containers[ rule.index ].rules, ...rule.rules };
         } );
     }
 
