@@ -116,9 +116,11 @@ export class ResizeService {
         }
     }
 
-    public updateRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ) {
+    public updateDedicatedRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ) {
         payload.forEach( ( rule ) => {
-            this.containers[ rule.index ].rules = { ...this.containers[ rule.index ].rules, ...rule.rules };
+            const { rules, index } = rule;
+            if ( index > this.containers.length - 1 ) throw new Error( "[resize-service]: Index array out of bound" );
+            this.containers[ index ].rules = { ...this.containers[ rule.index ].rules, ...rules };
         } );
     }
 
