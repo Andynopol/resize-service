@@ -73,10 +73,18 @@
       <p>Therefor this function can be called to refresh the value of the size to the current one if the context size
         changes in a particular usecase.</p>
 
+      <h3 class="service-method">updateRuntimeRules (payload: Array<{rules: {[key: string]: any}, index: number}>):
+      </h3>
+      <p>In this function updates the runtime rules of all containers. If any containers has no rules, than they will be
+        added.</p>
+
       <h3 class="service-method">updateDedicatedRules (payload: Array<{rules: {[key: string]: any}, index: number}>):
       </h3>
       <p>In this function updates the rules of the specified containers. It replaces the values inside rules object of
-        the specified container with the values of the specified keys inside corresponding payload object.</p>
+        the specified container with the values of the specified keys inside corresponding payload object. If the
+        specified container has no rules, than the rules will be added.</p>
+
+
     </div>
   </div>
 
