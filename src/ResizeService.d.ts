@@ -30,6 +30,7 @@ export declare class ResizeService {
   resize ( sizes: Array<number>, type: ResizeCases ): void;
   refreshContextSize (): void;
   updateDedicatedRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ): void;
+  updateRuntimeRules ( rules: ConstraintValueObject<any> ): void;
   destructor (): void;
 
 }

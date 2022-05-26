@@ -120,7 +120,15 @@ export class ResizeService {
         payload.forEach( ( rule ) => {
             const { rules, index } = rule;
             if ( index > this.containers.length - 1 ) throw new Error( "[resize-service]: Index array out of bound" );
-            this.containers[ index ].rules = { ...this.containers[ rule.index ].rules, ...rules };
+            this.containers[ index ].rules ?
+                this.containers[ index ].rules = { ...this.containers[ rule.index ].rules, ...rules } :
+                this.containers[ index ].rules = { ...rules };
+        } );
+    }
+
+    public updateRuntimeRules ( rules: ConstraintValueObject<any> ) {
+        this.containers.forEach( ( container: Container ) => {
+            container.rules ? container.rules = { ...container.rules, ...rules } : container.rules = { ...rules };
         } );
     }
 
