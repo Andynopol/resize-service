@@ -29,7 +29,7 @@ export declare class ResizeService {
   init ( appendCss?: boolean, initSize?: number | Array<number>, type?: ResizeCases ): void;
   resize ( sizes: Array<number>, type: ResizeCases ): void;
   refreshContextSize (): void;
-  updateRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ): void;
+  updateDedicatedRules ( payload: Array<{ index: number, rules: ConstraintValueObject<any>; }> ): void;
   destructor (): void;
 
 }
