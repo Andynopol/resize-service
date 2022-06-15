@@ -17,7 +17,7 @@ export class ResizeService {
     private _sizeKey: SizeKey;
     private _offsetSizeKey: OffsetSizeKey;
     private _contextSize: number;
-    private _separators: Array<HTMLElement>;
+    private _separators: Array<HTMLElement> = [];
     private styles: HTMLElement;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules ) {
@@ -92,8 +92,10 @@ export class ResizeService {
     public destructor () {
         this.context.removeChild( this.styles );
         this.context.classList.remove( "resize-main-context", `${ this.orientation }-resize-context` );
-        const separators = [ ...( this.context.getElementsByClassName( "resize-separator" ) as any ) ];
-        separators.forEach( separator => this.context.removeChild( separator ) );
+        this.separators.forEach( separator => {
+            this.context.removeChild( separator );
+            this.separators.shift();
+        } );
         this.containers.forEach( container => {
             container.removeAttribute( "rules" );
             container.removeAttribute( "style" );
