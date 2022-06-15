@@ -17,7 +17,7 @@ export class ResizeService {
     private _sizeKey: SizeKey;
     private _offsetSizeKey: OffsetSizeKey;
     private _contextSize: number;
-    private _separators: Array<HTMLElement>;
+    private _separators: Array<HTMLElement> = [];
     private styles: HTMLElement;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules ) {
