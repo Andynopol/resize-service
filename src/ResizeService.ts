@@ -92,8 +92,10 @@ export class ResizeService {
     public destructor () {
         this.context.removeChild( this.styles );
         this.context.classList.remove( "resize-main-context", `${ this.orientation }-resize-context` );
-        const separators = [ ...( this.context.getElementsByClassName( "resize-separator" ) as any ) ];
-        separators.forEach( separator => this.context.removeChild( separator ) );
+        this.separators.forEach( separator => {
+            this.context.removeChild( separator );
+            this.separators.shift();
+        } );
         this.containers.forEach( container => {
             container.removeAttribute( "rules" );
             container.removeAttribute( "style" );
