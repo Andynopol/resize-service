@@ -17,6 +17,7 @@ export class ResizeService {
     private _sizeKey: SizeKey;
     private _offsetSizeKey: OffsetSizeKey;
     private _contextSize: number;
+    private _separators: Array<HTMLElement>;
     private styles: HTMLElement;
 
     constructor ( context: HTMLElement, containers: Array<HTMLElement>, orientation: Orientation = "vertical", rules?: Rules ) {
@@ -59,6 +60,10 @@ export class ResizeService {
 
     get contextSize () {
         return this._contextSize;
+    }
+
+    get separators () {
+        return this._separators;
     }
 
     set containers ( containers: Array<Container> ) {
@@ -223,6 +228,7 @@ export class ResizeService {
             const separatorElement = this.createSeparator();
             separatorElement.addEventListener( 'mousedown', this.activateSeparator.bind( this ) );
             this.containers[ index ].parentNode.insertBefore( separatorElement, this.containers[ index ].nextSibling );
+            this.separators.push( separatorElement );
         }
     }
 
